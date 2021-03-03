@@ -1,0 +1,3 @@
+include ':phone'
+include ':watch'
+rootProject.name = "WatchTest"
