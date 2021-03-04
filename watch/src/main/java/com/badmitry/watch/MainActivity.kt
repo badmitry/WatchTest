@@ -1,20 +1,18 @@
 package com.badmitry.watch
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Bundle
-import android.support.wearable.activity.WearableActivity
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.badmitry.watchtest.R
 import java.text.DecimalFormat
 
-class MainActivity : WearableActivity() {
+class MainActivity : Activity() {
     private var mWatch: TextView? = null
     private var mSmartphone: TextView? = null
     var messageReceiver: MessageReceiver = MessageReceiver()
@@ -29,16 +27,15 @@ class MainActivity : WearableActivity() {
             override fun onReceive(context: Context?, i: Intent) {
                 val level: Int = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
                 val scale: Int = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-                mSmartphoneLevel = DecimalFormat("0.0")
+                mWatchLevel = DecimalFormat("0.0")
                     .format((level.toFloat() / scale.toFloat() * 100.0f).toDouble()) + "%"
-                sendMessage(this@MainActivity, mSmartphoneLevel)
+                sendMessage(this@MainActivity, mWatchLevel)
                 updateUI()
             }
         }
         registerReceiver(mBatteryLevelReceiver, batteryLevelFilter)
         val messageFilter = IntentFilter(Intent.ACTION_SEND)
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, messageFilter)
-        setAmbientEnabled()
     }
 
     fun updateUI() {
@@ -79,20 +76,20 @@ class MainActivity : WearableActivity() {
     inner class MessageReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val message: String? = intent.getStringExtra("message")
-            println("!!! watch $message")
-            mWatchLevel = message?:""
+            mSmartphoneLevel = message?:""
             updateUI()
         }
+    }
+
+    fun sendMessage(context: Context, param1: String?) {
+        val intent = Intent(context, ListenerService::class.java)
+        intent.setAction(ListenerService.ACTION_SM)
+        intent.putExtra(ListenerService.ACTION_SM_PARAM, param1)
+        context.startService(intent)
     }
 
     companion object {
         var mWatchLevel = "?"
         var mSmartphoneLevel = "?"
-        fun sendMessage(context: Context, param1: String?) {
-            val intent = Intent(context, ListenerService::class.java)
-            intent.setAction(ListenerService.ACTION_SM)
-            intent.putExtra(ListenerService.ACTION_SM_PARAM, param1)
-            context.startService(intent)
-        }
     }
 }

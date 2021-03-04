@@ -10,10 +10,7 @@ import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import java.util.concurrent.TimeUnit
 
-
 class ListenerService : WearableListenerService() {
-    private val prefs: SharedPreferences? = null
-    private val mIsAlarmOn = false
     var googleClient: GoogleApiClient? = null
     companion object {
         val ACTION_SM = "com.rusdelphi.batterywatcher.action.SM"
@@ -55,7 +52,7 @@ class ListenerService : WearableListenerService() {
                             if (result.status.isSuccess) {
                                 Log.d(
                                     "main",
-                                    "Message: {" + param1 + "} sent to: " + node.displayName
+                                    "Message watch: {" + param1 + "} sent to: " + node.displayName
                                 )
                             } else {
                                 // Log an error

@@ -7,8 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -80,20 +78,20 @@ class MainActivity : Activity() {
     inner class MessageReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val message = intent.getStringExtra("message")
-            println("!!! phone $message")
             mWatchLevel = message
             updateUI()
         }
     }
 
+    fun sendMessage(context: Context, param1: String?) {
+        val intent = Intent(context, ListenerService::class.java)
+        intent.action = ListenerService.ACTION_SM
+        intent.putExtra(ListenerService.ACTION_SM_PARAM, param1)
+        context.startService(intent)
+    }
+
     companion object {
         var mWatchLevel: String? = "?"
         var mSmartphoneLevel = "?"
-        fun sendMessage(context: Context, param1: String?) {
-            val intent = Intent(context, ListenerService::class.java)
-            intent.action = ListenerService.ACTION_SM
-            intent.putExtra(ListenerService.ACTION_SM_PARAM, param1)
-            context.startService(intent)
-        }
     }
 }
